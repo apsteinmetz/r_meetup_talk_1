@@ -1,0 +1,294 @@
+---
+title: "Powerful GIS Made Easy With R"
+subtitle: "Modeling Flooding From The Kakhovka Dam Destruction"
+author: "Art Steinmetz"
+format: revealjs
+execute: 
+  echo: true
+---
+
+## Goals
+
+-   Learn about the huge strides made recently in open source GIS
+-   See how easy map making is with R
+-   Create a compelling visualization with an animated flood inundation map
+
+## The Old Days
+
+-   Proprietary GIS data locked up by goverments
+-   ArcGIS by ESRI - Great but priced for governments and corporations
+
+
+## Modern Tool Chain
+
+-   QGIS is to ArcGIS as GIMP is to Photoshop
+
+::: columns
+::: {.column width="50%"}
+![](img/arcgispricing.jpg) 
+:::
+
+::: {.column width="50%"}
+![](img/qgisscreen.jpg)
+:::
+:::
+
+
+## Modern Tool Chain in R
+
+In just the past few years several R packages have arrived that make powerful GIS Tools available to everyone.
+
+-   sf/terra
+-   Maptools/Leaflet
+-   Rayshader
+-   osmdata
+-   elevatr
+
+## Modern Data Sets
+
+These tools can access a vast universe of publically available map data including
+
+-   OpenStreetMap
+-   USGS topographic data
+-   Regional government property data
+-   and many more!
+
+Some are open. Some require a free API key. Learn how to request a key and to save it in your .REnviron file.  Never put key in code!
+
+## Setting Up Our Task
+::: columns
+::: {.column width="60%"}
+The war in Ukraine has spawned yet another disaster, the destruction of a dam across the Dnipro river, upstream from Kherson City. This is an ecological and humanitarian disaster as vast acres of settlements, farmlands and wetlands have been destroyed.
+
+Can we visualize how the rising water has submerged much of the land downstream from the dam?
+:::
+::: {.column width="40%"}
+<iframe width="560" height="315" src="https://www.youtube.com/embed/cALesMyx4UA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+:::
+:::
+
+## Magic Trick #1: Visualize the Affected Area
+```{r setup}
+#| echo: false
+library(tidyverse)
+library(fs)
+# GIS packages
+library(elevatr)
+library(rayshader)
+library(sf)
+library(raster)
+library(leaflet)
+library(osmdata)
+library(basemaps)
+# Make GIFs
+library(magick)
+
+dms_to_dec <- function(deg=0, min=0, sec=0) {
+  return(deg + min / 60 + sec / 3600)
+}
+kh_loc <- data.frame(lat = c(dms_to_dec(46,51,00),dms_to_dec(46,18,00)),
+                             lon= c(dms_to_dec(32,09,00),dms_to_dec(33,25,00)) )
+```
+
+```{r leaflet map}
+leaflet() |> 
+  fitBounds(32.15,46.85,33.417,46.30) |> 
+  addProviderTiles(providers$Esri.WorldImagery) |> 
+  addProviderTiles(providers$CartoDB.PositronOnlyLabels,
+                   options = providerTileOptions(opacity = 1))
+```
+## Create a Spatial Object for All Further Manipulations
+Introducing the  *simple features* object.  
+- It holds spatial metadata and map features.
+```{r}
+kh_loc
+kherson_dnipro <- kh_loc |> 
+  sf::st_as_sf(coords = c("lon","lat"),crs = 4326)
+kherson_dnipro
+```
+## Simple Features Objects Can be Treated Like Data Frames!
+You can add your own features to the map.
+```{r}
+kherson_dnipro |> 
+  mutate(my_stuff =c("Corner 1","Corner 2"))
+```
+## Simple Feature Objects Are Simple
+You can inspect or extract items using familiar techniques while preserving metadata.
+```{r inspect sf}
+kherson_dnipro$geometry[1]
+kherson_dnipro$geometry[1][[1]][1]
+
+```
+## Introducing Another Spatial Object : Raster
+- A Matrix with metadata and a value for each point/pixel on a map.
+- Values can be anything.  We will get a raster with elevation data in meters.
+
+## Magic Trick #2: Get The Elevation Data with One Line
+
+```{r get elevaton raster}
+#| eval: false
+#| echo: true
+
+kherson_elev <- elevatr::get_elev_raster(kherson_dnipro, 
+                                src = "gl1", 
+                                clip = "bbox",
+                                verbose = FALSE,
+                                serial=TRUE) 
+
+```
+```{r}
+#| echo: false
+# dir("data/")
+load("data//kherson_elev.rdata")
+kherson_elev
+```
+
+## Quick and Dirty Plot
+Raster has a base R plot method we can use to make a false color relief map.
+
+- Elevations run from -51 to 107 meters. 
+- Set a color ramp from blue to green.
+
+##
+
+```{r}
+pal <- colorRampPalette(c("darkblue","limegreen"))
+plot(kherson_elev, col = pal(10))
+```
+## Introducting Rayshader: Beautiful 3D Visualizations
+
+::: columns
+::: {.column width="50%"}
+![](img/gwl_map_history.gif) 
+:::
+
+::: {.column width="50%"}
+![](img/confusion.gif)
+:::
+:::
+
+## More Rayshader Porn
+
+::: columns
+::: {.column width="50%"}
+![](img/forest_cover_france.jpg) 
+:::
+
+::: {.column width="50%"}
+![](img/chicago_buildings.jpg)
+:::
+:::
+
+## Our Goal: Make an Animated Flood Innundation Map
+
+- Make a false color shaded relief map as a base layer.
+- Rayshader detects water as zero elevation or expanses of no elevation change.
+
+::: columns
+
+::: {.column width="50%"}
+```{r create base map}
+#| eval: false
+#| message: false
+kh_elmat <- raster_to_matrix(
+  kherson_elev)
+base_map <- kh_elmat |> 
+  sphere_shade(texture = "imhof1",
+               zscale = .8) |> 
+  add_water(detect_water(kh_elmat),
+            color="desert")
+
+plot_map(base_map)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| echo: false
+kh_elmat <- raster_to_matrix(
+  kherson_elev)
+load("data/base_map.rdata")
+plot_map(base_map)
+```
+:::
+
+:::
+
+## Add Realism: Satellite Imagery
+```{r}
+# get image overlay
+satview <- basemaps::basemap_png(
+  ext = kherson_dnipro,
+  map_service = "esri",
+  map_type = "world_imagery",
+  map_res = NULL,
+  verbose = TRUE,
+  browse = FALSE
+)
+```
+
+## Add More Realism: Roads To Show Human Presence
+- Open Street Map API offers many layers of map features
+- Take just the "highway"/osm_lines.
+```{r transform CRS}
+#| eval: false
+kherson_roads <- osmdata::opq(st_bbox(kherson_dnipro)) |> 
+    osmdata::add_osm_feature("highway") |> 
+    osmdata::osmdata_sf()
+
+kherson_roads$osm_lines[1:3,c(1,2,6)]
+```
+
+```{r load roads}
+#| echo: false
+load("data/kherson_roads.rdata")
+kherson_roads$osm_lines[1:3,c(1,2,6)]
+```
+## Big Gotcha With GIS: Coordinate Reference System (CRS)
+
+- There are many, many ways of projecting a curved planet onto a flat surface.
+- When combining GIS data from different sources, CRS's must match..
+- The elevation data comes from the Open Topography API.
+- The street data comes from the Open Street Maps API.
+
+## The Solution
+- `st_transfrom`  reprojects data to a new CRS.
+
+```{r}
+kherson_lines <- sf::st_transform(kherson_roads$osm_lines,
+                                  crs = raster::crs(kherson_dnipro))
+kherson_lines |> crs() |> cat()
+```
+## View the Streets Data
+- Remember how we said a simple feature object is a data frame with metadata?
+- It just so happens that `ggplot2` has a `geom_sf` just for such objects.
+```{r ggplot streets}
+#| eval: false
+ggplot(kherson_lines, aes(color = osm_id)) + 
+  geom_sf() +
+  theme(legend.position = "none") +
+  labs(title = "Kherson Roads from Open Street Map")
+```
+##
+```{r}
+#| echo: false
+ggplot(kherson_lines, aes(color = osm_id)) + 
+  geom_sf() +
+  theme(legend.position = "none") +
+  labs(title = "Kherson Roads from Open Street Map")
+
+```
+
+## Generate Road Overlay for Rayshader
+- Generate road layer to reuse in each frame of the animation
+```{r}
+# a rayshader object we pre-generate now for speed later
+roads <-  generate_line_overlay(
+  kherson_lines,
+  heightmap = kh_elmat,
+  extent = extent(extent(kherson_dnipro)),
+  linewidth = 2
+)
+
+```
+
