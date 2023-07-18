@@ -461,14 +461,14 @@ Art Steinmetz
 <li>Regional government property data</li>
 <li>and many more!</li>
 </ul>
-<p>Some are open. Some require a free API key. Learn how to request a key and to save it in your .REnviron file. Never put key in code!</p>
+<p>Some are open. Some require a free API key. Learn how to request a key and to save it in your <code>.Renviron</code> file. Never put key in code!</p>
 </section>
-<section id="setting-up-our-task" class="slide level2">
-<h2>Setting Up Our Task</h2>
+<section id="background" class="slide level2">
+<h2>Background</h2>
 <div class="columns">
 <div class="column" style="width:60%;">
-<p>The war in Ukraine has spawned yet another disaster, the destruction of a dam across the Dnipro river, upstream from Kherson City. This is an ecological and humanitarian disaster as vast acres of settlements, farmlands and wetlands have been destroyed.</p>
-<p>Can we visualize how the rising water has submerged much of the land downstream from the dam?</p>
+<p>Among the horrors of the the war in Ukraine has been the destruction of a dam across the Dnipro river, upstream from Kherson City. This is an ecological and humanitarian disaster as vast acres of settlements, farmlands and wetlands have been destroyed.</p>
+<p>Can we visualize how the rising water submerged much of the land downstream from the dam?</p>
 </div><div class="column" style="width:40%;">
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cALesMyx4UA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="">
 </iframe>
@@ -479,13 +479,13 @@ Art Steinmetz
 <h2>Magic Trick #1: Visualize the Affected Area</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">leaflet</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb1-2"><a href="#cb1-2"></a>  <span class="fu">fitBounds</span>(<span class="fl">32.15</span>,<span class="fl">46.85</span>,<span class="fl">33.417</span>,<span class="fl">46.30</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-2"><a href="#cb1-2"></a>  <span class="fu">fitBounds</span>(<span class="fl">32.15</span>,<span class="fl">46.85</span>,<span class="fl">33.41887</span>,<span class="fl">46.30</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb1-3"><a href="#cb1-3"></a>  <span class="fu">addProviderTiles</span>(providers<span class="sc">$</span>Esri.WorldImagery) <span class="sc">|&gt;</span> </span>
 <span id="cb1-4"><a href="#cb1-4"></a>  <span class="fu">addProviderTiles</span>(providers<span class="sc">$</span>CartoDB.PositronOnlyLabels,</span>
 <span id="cb1-5"><a href="#cb1-5"></a>                   <span class="at">options =</span> <span class="fu">providerTileOptions</span>(<span class="at">opacity =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-0e4b61430accd7e8b1c8" style="width:960px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-0e4b61430accd7e8b1c8">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"fitBounds":[46.85,32.15,46.3,33.417,[]],"calls":[{"method":"addProviderTiles","args":["Esri.WorldImagery",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["CartoDB.PositronOnlyLabels",null,null,{"errorTileUrl":"","noWrap":false,"opacity":1,"detectRetina":false}]}]},"evals":[],"jsHooks":[]}</script>
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-e086a0189fb5f6abfa13" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-e086a0189fb5f6abfa13">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"fitBounds":[46.85,32.15,46.3,33.41887,[]],"calls":[{"method":"addProviderTiles","args":["Esri.WorldImagery",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["CartoDB.PositronOnlyLabels",null,null,{"errorTileUrl":"","noWrap":false,"opacity":1,"detectRetina":false}]}]},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
@@ -646,6 +646,7 @@ values     : -51, 107  (min, max)</code></pre>
 </section>
 <section id="add-realism-satellite-imagery" class="slide level2">
 <h2>Add Realism: Satellite Imagery</h2>
+<p>Using the <code>add_overlay()</code> function in <code>Rayshader</code> we can layer on the same satellite image with saw at the start. The <code>basemaps</code> package makes getting a snapshot from any map source a piece of cake.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># get image overlay</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a>satview <span class="ot">&lt;-</span> basemaps<span class="sc">::</span><span class="fu">basemap_png</span>(</span>
@@ -655,12 +656,15 @@ values     : -51, 107  (min, max)</code></pre>
 <span id="cb16-6"><a href="#cb16-6"></a>  <span class="at">map_res =</span> <span class="cn">NULL</span>,</span>
 <span id="cb16-7"><a href="#cb16-7"></a>  <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb16-8"><a href="#cb16-8"></a>  <span class="at">browse =</span> <span class="cn">FALSE</span></span>
-<span id="cb16-9"><a href="#cb16-9"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Loading basemap 'world_imagery' from map service 'esri'...</code></pre>
-</div>
+<span id="cb16-9"><a href="#cb16-9"></a>)</span>
+<span id="cb16-10"><a href="#cb16-10"></a></span>
+<span id="cb16-11"><a href="#cb16-11"></a>base_map <span class="sc">|&gt;</span> <span class="fu">add_overlay</span>(satview) <span class="sc">|&gt;</span> <span class="fu">plot_map</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+<section id="section-1" class="slide level2">
+<h2></h2>
+
+<img data-src="r_meetup_talk_1_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
 <section id="add-more-realism-roads-to-show-human-presence" class="slide level2">
 <h2>Add More Realism: Roads To Show Human Presence</h2>
 <ul>
@@ -668,11 +672,11 @@ values     : -51, 107  (min, max)</code></pre>
 <li>Take just the “highway”/osm_lines.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>kherson_roads <span class="ot">&lt;-</span> osmdata<span class="sc">::</span><span class="fu">opq</span>(<span class="fu">st_bbox</span>(kherson_dnipro)) <span class="sc">|&gt;</span> </span>
-<span id="cb18-2"><a href="#cb18-2"></a>    osmdata<span class="sc">::</span><span class="fu">add_osm_feature</span>(<span class="st">"highway"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb18-3"><a href="#cb18-3"></a>    osmdata<span class="sc">::</span><span class="fu">osmdata_sf</span>()</span>
-<span id="cb18-4"><a href="#cb18-4"></a></span>
-<span id="cb18-5"><a href="#cb18-5"></a>kherson_roads<span class="sc">$</span>osm_lines[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">6</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>kherson_roads <span class="ot">&lt;-</span> osmdata<span class="sc">::</span><span class="fu">opq</span>(<span class="fu">st_bbox</span>(kherson_dnipro)) <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2"></a>    osmdata<span class="sc">::</span><span class="fu">add_osm_feature</span>(<span class="st">"highway"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb17-3"><a href="#cb17-3"></a>    osmdata<span class="sc">::</span><span class="fu">osmdata_sf</span>()</span>
+<span id="cb17-4"><a href="#cb17-4"></a></span>
+<span id="cb17-5"><a href="#cb17-5"></a>kherson_roads<span class="sc">$</span>osm_lines[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">6</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -692,9 +696,12 @@ Geodetic CRS:  WGS 84
 <h2>Big Gotcha With GIS: Coordinate Reference System (CRS)</h2>
 <ul>
 <li>There are many, many ways of projecting a curved planet onto a flat surface.</li>
-<li>When combining GIS data from different sources, CRS’s must match..</li>
+<li>When combining GIS data from different sources, CRS’s must match.
+<ul>
 <li>The elevation data comes from the Open Topography API.</li>
 <li>The street data comes from the Open Street Maps API.</li>
+<li>The satellite image comes from ESRI.</li>
+</ul></li>
 </ul>
 </section>
 <section id="the-solution" class="slide level2">
@@ -703,9 +710,9 @@ Geodetic CRS:  WGS 84
 <li><code>st_transfrom</code> reprojects data to a new CRS.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>kherson_lines <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_transform</span>(kherson_roads<span class="sc">$</span>osm_lines,</span>
-<span id="cb20-2"><a href="#cb20-2"></a>                                  <span class="at">crs =</span> raster<span class="sc">::</span><span class="fu">crs</span>(kherson_dnipro))</span>
-<span id="cb20-3"><a href="#cb20-3"></a>kherson_lines <span class="sc">|&gt;</span> <span class="fu">crs</span>() <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>kherson_lines <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_transform</span>(kherson_roads<span class="sc">$</span>osm_lines,</span>
+<span id="cb19-2"><a href="#cb19-2"></a>                                  <span class="at">crs =</span> raster<span class="sc">::</span><span class="fu">crs</span>(kherson_dnipro))</span>
+<span id="cb19-3"><a href="#cb19-3"></a>kherson_lines <span class="sc">|&gt;</span> <span class="fu">crs</span>() <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>GEOGCRS["WGS 84",
     ENSEMBLE["World Geodetic System 1984 ensemble",
@@ -743,31 +750,60 @@ Geodetic CRS:  WGS 84
 <li>It just so happens that <code>ggplot2</code> has a <code>geom_sf</code> just for such objects.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">ggplot</span>(kherson_lines, <span class="fu">aes</span>(<span class="at">color =</span> osm_id)) <span class="sc">+</span> </span>
-<span id="cb22-2"><a href="#cb22-2"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
-<span id="cb22-3"><a href="#cb22-3"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb22-4"><a href="#cb22-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Kherson Roads from Open Street Map"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">ggplot</span>(kherson_lines, <span class="fu">aes</span>(<span class="at">color =</span> osm_id)) <span class="sc">+</span> </span>
+<span id="cb21-2"><a href="#cb21-2"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Kherson Roads from Open Street Map"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="section-1" class="slide level2">
+<section id="section-2" class="slide level2">
 <h2></h2>
 
-<img data-src="r_meetup_talk_1_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
+<img data-src="r_meetup_talk_1_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
 <section id="generate-road-overlay-for-rayshader" class="slide level2">
 <h2>Generate Road Overlay for Rayshader</h2>
 <ul>
-<li>Generate road layer to reuse in each frame of the animation</li>
+<li>Generate road layer to reuse in each frame of the animation.</li>
+<li>Speed up rendering by precomputing layers that don’t change.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="co"># a rayshader object we pre-generate now for speed later</span></span>
-<span id="cb23-2"><a href="#cb23-2"></a>roads <span class="ot">&lt;-</span>  <span class="fu">generate_line_overlay</span>(</span>
-<span id="cb23-3"><a href="#cb23-3"></a>  kherson_lines,</span>
-<span id="cb23-4"><a href="#cb23-4"></a>  <span class="at">heightmap =</span> kh_elmat,</span>
-<span id="cb23-5"><a href="#cb23-5"></a>  <span class="at">extent =</span> <span class="fu">extent</span>(<span class="fu">extent</span>(kherson_dnipro)),</span>
-<span id="cb23-6"><a href="#cb23-6"></a>  <span class="at">linewidth =</span> <span class="dv">2</span></span>
-<span id="cb23-7"><a href="#cb23-7"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="co"># a rayshader object we pre-generate now for speed later</span></span>
+<span id="cb22-2"><a href="#cb22-2"></a>roads <span class="ot">&lt;-</span>  rayshader<span class="sc">::</span><span class="fu">generate_line_overlay</span>(</span>
+<span id="cb22-3"><a href="#cb22-3"></a>  kherson_lines,</span>
+<span id="cb22-4"><a href="#cb22-4"></a>  <span class="at">heightmap =</span> kh_elmat,</span>
+<span id="cb22-5"><a href="#cb22-5"></a>  <span class="at">extent =</span> <span class="fu">extent</span>(<span class="fu">extent</span>(kherson_dnipro)),</span>
+<span id="cb22-6"><a href="#cb22-6"></a>  <span class="at">linewidth =</span> <span class="dv">2</span></span>
+<span id="cb22-7"><a href="#cb22-7"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="footer footer-default">
+</section>
+<section id="put-the-layers-together" class="slide level2">
+<h2>Put the Layers together</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>base_map <span class="sc">|&gt;</span> <span class="fu">add_overlay</span>(<span class="st">"img/esri_world_imagery.png"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb23-2"><a href="#cb23-2"></a>  <span class="fu">add_overlay</span>(roads) <span class="sc">|&gt;</span> <span class="fu">plot_map</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="r_meetup_talk_1_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section>
+<section id="show-rising-water" class="slide level2">
+<h2>Show Rising Water</h2>
+<ul>
+<li>Set any height in the elevation matrix below the “water level” to zero so Rayshader considers it water.</li>
+<li>Order of the overlay matters. Here: sat image, water, roads.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>water_level <span class="ot">=</span> <span class="dv">5</span> <span class="co"># meters above sea level</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>flood_elmat <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(kh_elmat <span class="sc">&lt;</span> water_level, <span class="dv">0</span>, kh_elmat)</span>
+<span id="cb24-3"><a href="#cb24-3"></a>  </span>
+<span id="cb24-4"><a href="#cb24-4"></a>last_map <span class="ot">&lt;-</span> base_map <span class="sc">|&gt;</span></span>
+<span id="cb24-5"><a href="#cb24-5"></a>  <span class="fu">add_overlay</span>(<span class="st">"img/esri_world_imagery.png"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb24-6"><a href="#cb24-6"></a>  <span class="fu">add_water</span>(<span class="fu">detect_water</span>(flood_elmat), <span class="at">color =</span> <span class="st">"desert"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-7"><a href="#cb24-7"></a>  <span class="fu">add_overlay</span>(roads) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="section-3" class="slide level2">
+<h2></h2>
+
+<img data-src="r_meetup_talk_1_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"><div class="footer footer-default">
 
 </div>
 </section>
