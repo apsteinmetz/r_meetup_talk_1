@@ -13,6 +13,12 @@ execute:
 -   See how easy map making is with R
 -   Create a compelling visualization with an animated flood inundation map
 
+## Who I Am
+- Retired Investment Executive
+- Open Source Evangelist
+- Data Science Hobbyist
+- Blogger at `outsiderdata.net`
+
 ## The Old Days
 
 -   Proprietary GIS data locked up by goverments
@@ -165,7 +171,7 @@ Raster has a base R plot method we can use to make a false color relief map.
 -   Elevations run from -51 to 107 meters.
 -   Set a color ramp from blue to green.
 
-## 
+## False Color Topgraphic Map
 
 ```{r}
 pal <- colorRampPalette(c("darkblue","limegreen"))
@@ -201,8 +207,6 @@ plot(kherson_elev, col = pal(10))
 -   Make a false color shaded relief map as a base layer.
 -   Rayshader detects water as zero elevation or expanses of no elevation change.
 
-::: columns
-::: {.column width="50%"}
 ```{r create base map}
 #| eval: false
 #| message: false
@@ -216,24 +220,22 @@ base_map <- kh_elmat |>
 
 plot_map(base_map)
 ```
-:::
+## Shaded Elevation Map with Natural Water Levels
+![](img/base_map.png)
 
-::: {.column width="50%"}
 ```{r}
+
 #| echo: false
 kh_elmat <- raster_to_matrix(
   kherson_elev)
 load("data/base_map.rdata")
-plot_map(base_map)
 ```
-:::
-:::
 
 ## Add Realism: Satellite Imagery
 
 Using the `add_overlay()` function in `Rayshader` we can layer on the same satellite image with saw at the start. The `basemaps` package makes getting a snapshot from any map source a piece of cake.
 
-```{r}
+```{r show sat img}
 #| eval: false
 # get image overlay
 satview <- basemaps::basemap_png(
@@ -248,18 +250,14 @@ satview <- basemaps::basemap_png(
 base_map |> add_overlay(satview) |> plot_map()
 ```
 
-## 
+## Base Map with Satellite Image Overlay
 
-```{r}
-#| echo: false
-base_map |> add_overlay("img/esri_world_imagery.png") |> plot_map()
-
-```
+![](img/satview.png)
 
 ## Add More Realism: Roads To Show Human Presence
 
--   Open Street Map API offers many layers of map features
--   Take just the "highway"/osm_lines.
+-   Open Street Map API offers many layers of map features.
+-   Take just the osm_lines layer of the "highway" feature.
 
 ```{r transform CRS}
 #| eval: false
@@ -297,7 +295,7 @@ kherson_lines |> crs() |> cat()
 ## View the Streets Data
 
 -   Remember how we said a simple feature object is a data frame with metadata?
--   It just so happens that `ggplot2` has a `geom_sf` just for such objects.
+-   It just so happens that `ggplot2` has a `geom_sf` for such objects.
 
 ```{r ggplot streets}
 #| eval: false
@@ -307,14 +305,13 @@ ggplot(kherson_lines, aes(color = osm_id)) +
   labs(title = "Kherson Roads from Open Street Map")
 ```
 
-## 
+## Kherson Roads from Open Street Map
 
 ```{r}
 #| echo: false
 ggplot(kherson_lines, aes(color = osm_id)) + 
   geom_sf() +
-  theme(legend.position = "none") +
-  labs(title = "Kherson Roads from Open Street Map")
+  theme(legend.position = "none")
 
 ```
 
@@ -323,7 +320,7 @@ ggplot(kherson_lines, aes(color = osm_id)) +
 -   Generate road layer to reuse in each frame of the animation.
 -   Speed up rendering by precomputing layers that don't change.
 
-```{r}
+```{r generate street overlay}
 # a rayshader object we pre-generate now for speed later
 roads <-  rayshader::generate_line_overlay(
   kherson_lines,
@@ -336,7 +333,7 @@ roads <-  rayshader::generate_line_overlay(
 
 ## Put the Layers together
 
-```{r}
+```{r show all layers}
 base_map |> add_overlay("img/esri_world_imagery.png") |> 
   add_overlay(roads) |> plot_map()
 
@@ -347,12 +344,12 @@ base_map |> add_overlay("img/esri_world_imagery.png") |>
 -   Set any height in the elevation matrix below the "water level" to zero so Rayshader considers it water.
 -   Order of the overlay matters. Here: sat image, water, roads.
 
-```{r}
+```{r show high water}
 #| eval: false
 water_level = 5 # meters above sea level
 flood_elmat <- ifelse(kh_elmat < water_level, 0, kh_elmat)
   
-last_map <- base_map |>
+base_map |>
   add_overlay("img/esri_world_imagery.png") |> 
   add_water(detect_water(flood_elmat), color = "desert") |>
   add_overlay(roads) 
@@ -360,9 +357,77 @@ last_map <- base_map |>
 ```
 
 ## 
+![](img/base_map_water.png){width=70%}
 
+![](img/last_map.png){width=70%}
+
+## At last, Let's Animate!
+
+
+ - Loop through different values for `water_level`.
+ - Save indivdual images as frames.
+ 
 ```{r}
-#| echo: false
-load("data/lastmap.rdata")
-plot_map(last_map)
+#| eval: false
+plot_rising_water <- function(water_level = 0) {
+  flood_elmat <- ifelse(kh_elmat < water_level, 0, kh_elmat)
+  base_map |>
+    add_water(detect_water(flood_elmat), color = "desert") |>
+    add_overlay(roads) |>
+    save_png(
+      filename = paste0("img/frames/flood_", 
+                        formatC(water_level, width = 3, flag = "0"), ".png"),
+      title_text = paste0(
+        "Flood Inundation of the Dnipro\nAfter Kakhovka Dam Destruction\n
+        Water Level:",
+        formatC(water_level, width = 3, flag = " ")," Meters"),
+      title_size = 60, title_bar_color = "white"
+    )
+}
+0:8 |> walk(plot_rising_water)
 ```
+ 
+##
+ - Animate as a GIF using the `magick` package.
+
+```{r animate gif}
+#| eval: false
+target_dir <- "img/frames"
+fnames <- paste0("img\\frames\\", dir("img/frames"))
+image_read(fnames[1:9]) |> 
+  image_resize("1000x") |> # make size manageable
+  image_morph() |>         # smooth transitions. default is 3 frames per frame.
+  image_animate() |>       # default is 10 fps
+  image_write(path = "img/flood.gif",format = "gif")
+```
+## The Finished Product
+
+![](img/flood.gif){width="1000"}
+
+## Caveats: This is Just a Dramatization
+
+_ The method we use here more properly would model rising sea levels. 
+  - We don’t know exactly how the water affected each area at what time.
+  - We don’t know what the peak inundation level was for each area.
+  - The water has receeded.
+  
+- This does give a dramatic view of the scope of the destruction.
+  - We do know many people were displaced.
+  - This clearly shows the vulnerable areas.
+  
+## Thank You!
+
+Visit My Data Science Blog:
+
+-    {{< fa blog size=1x >}}`outsiderdata.net`
+
+This Was Built With Quarto by Posit. Source Here:
+
+-    {{< fa brands github size=1xl >}} 
+`github.com/apsteinmetz/r_meetup_talk_1.git'
+    
+Connect With Me:
+
+-    {{< fa brands twitter size=1xl >}} `@adababbage`
+-    {{< fa house size=1xl >}}`artsteinmetz.com`
+-    {{< fa brands linkedin size=1xl >}}`asteinmetz`
