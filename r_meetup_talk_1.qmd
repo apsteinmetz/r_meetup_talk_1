@@ -2,7 +2,9 @@
 title: "Powerful GIS Made Easy With R"
 subtitle: "Modeling Flooding From The Kakhovka Dam Destruction"
 author: "Art Steinmetz"
-format: revealjs
+format: 
+  revealjs:
+    theme: blood
 execute: 
   echo: true
 ---
@@ -14,15 +16,18 @@ execute:
 -   Create a compelling visualization with an animated flood inundation map
 
 ## Who I Am
-- Retired Investment Executive
-- Open Source Evangelist
-- Data Science Hobbyist
-- Blogger at `outsiderdata.net`
+
+-   Retired Investment Executive
+-   Consultant for Posit
+-   Data Science Hobbyist
+-   Blogger at `outsiderdata.net`
 
 ## The Old Days
 
--   Proprietary GIS data locked up by goverments
--   ArcGIS by ESRI - Great but priced for governments and corporations
+-   Proprietary GIS data locked up by governments.
+-   ArcGIS by ESRI - Great but priced for governments and corporations.
+-   Data in ESRI "Shape Files."
+
 
 ## Modern Tool Chain
 
@@ -37,24 +42,29 @@ execute:
 ![](img/qgisscreen.jpg)
 :::
 :::
+-   Work with "Simple Features" data in R.
+  - Learn more: 
+  https://r-spatial.github.io/sf/articles/sf1.html
 
 ## Modern Tool Chain in R
 
 In just the past few years several R packages have arrived that make powerful GIS Tools available to everyone.
 
--   sf/terra
--   Maptools/Leaflet
--   Rayshader
--   osmdata
--   elevatr
+-   sf, terra - Manipulate spatial objects.
+-   Maptools, Leaflet - embed interactive maps.
+-   Rayshader - 3D rendering.
+-   osmdata - Access human-made map features.
+-   elevatr - Access topography/bathymetry.
 
 ## Modern Data Sets
 
 These tools can access a vast universe of publically available map data including
 
 -   OpenStreetMap
+-   OpenTopogrpahy
 -   USGS topographic data
 -   Regional government property data
+-   Terrain and building LIDAR scans
 -   and many more!
 
 Some are open. Some require a free API key. Learn how to request a key and to save it in your `.Renviron` file. Never put key in code!
@@ -69,7 +79,7 @@ Can we visualize how the rising water submerged much of the land downstream from
 :::
 
 ::: {.column width="40%"}
-<iframe width="560" height="315" src="https://www.youtube.com/embed/cALesMyx4UA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/cALesMyx4UA?&amp;autoplay=1" frameborder="0" allowfullscreen>
 
 </iframe>
 :::
@@ -142,6 +152,7 @@ kherson_dnipro$geometry[1][[1]][1]
 
 -   A Matrix with metadata and a value for each point/pixel on a map.
 -   Values can be anything. We will get a raster with elevation data in meters.
+-   A simple features object is a description of the map, while a raster object is the drawing of the map.
 
 ## Magic Trick #2: Get The Elevation Data with One Line
 
@@ -220,11 +231,12 @@ base_map <- kh_elmat |>
 
 plot_map(base_map)
 ```
+
 ## Shaded Elevation Map with Natural Water Levels
-![](img/base_map.png)
+
+![](img/base_map.png){fig-align="center"}
 
 ```{r}
-
 #| echo: false
 kh_elmat <- raster_to_matrix(
   kherson_elev)
@@ -252,7 +264,7 @@ base_map |> add_overlay(satview) |> plot_map()
 
 ## Base Map with Satellite Image Overlay
 
-![](img/satview.png)
+![](img/satview.png){fig-align="center"}
 
 ## Add More Realism: Roads To Show Human Presence
 
@@ -325,7 +337,7 @@ ggplot(kherson_lines, aes(color = osm_id)) +
 roads <-  rayshader::generate_line_overlay(
   kherson_lines,
   heightmap = kh_elmat,
-  extent = extent(extent(kherson_dnipro)),
+  extent = extent(kherson_dnipro),
   linewidth = 2
 )
 
@@ -357,16 +369,26 @@ base_map |>
 ```
 
 ## 
-![](img/base_map_water.png){width=70%}
 
-![](img/last_map.png){width=70%}
+![](img/base_map_water.png){width="70%" fig-align="center"}
+
+![](img/last_map.png){width="70%" fig-align="center"}
+
+## Caveats: This is Just a Dramatization
+
+-   The method we use here more properly would model rising sea levels.
+    -   We don't know exactly how the water affected each area at what time.
+    -   We don't know what the peak inundation level was for each area.
+    -   The water has receded.
+-   This does give a dramatic view of the scope of the destruction.
+    -   We do know many people were displaced.
+    -   This clearly shows the vulnerable areas.
 
 ## At last, Let's Animate!
 
+-   Loop through different values for `water_level`.
+-   Save indivdual images as frames.
 
- - Loop through different values for `water_level`.
- - Save indivdual images as frames.
- 
 ```{r}
 #| eval: false
 plot_rising_water <- function(water_level = 0) {
@@ -386,48 +408,80 @@ plot_rising_water <- function(water_level = 0) {
 }
 0:8 |> walk(plot_rising_water)
 ```
- 
-##
- - Animate as a GIF using the `magick` package.
+## Annotate A Scale
+
+Do Some really cool `magick` and `ggplot` customizing to add a scale to the plot.
+- Just eye candy.
+- Way more code and work than it's worth. 
+- Not shown.  Visit the Github repo to see it.
+- `github.com/apsteinmetz/r_meetup_talk_1.git`
+```{r create inset scale}
+#| echo: false
+#| eval: false
+draw_inset <- function(water_level){
+  df <- enframe(water_level)
+  gg <- ggplot(df,aes(1,water_level)) + geom_col(fill="blue") +
+    ylim(0,10) + 
+    theme_void() + 
+    theme(panel.grid.major.y = element_line(),
+          panel.background = element_rect(fill="forestgreen")) + 
+    annotate("text",x=1,y=9,
+             label = "Flood",  size = 40) +
+    annotate("text",x=1,y=4,
+             label = paste0(water_level," Meters"), size = 40) 
+  ggsave(paste0("insets/inset_",water_level,".png"),gg,device = "png",path="img")
+}
+0:8 |> walk(draw_inset)
+
+man <- image_read("img/man.png")
+new_man <- image_scale(man, "x200")
+fnames <- paste0("img\\frames\\", dir("img/frames"))
+fnames2 <- paste0("img\\frames2\\", dir("img/frames"))
+frames <- image_read(fnames[1:9])
+inames <- paste0("img\\insets\\", dir("img/insets"))
+insets <- image_read(inames[1:9])
+new_insets <- image_scale(insets, "600x1000!")
+new_frames <- frames
+# Add plot to annotated graphic
+# image_composite is not vectorized properly
+for (n in 1:9){
+new_frames[n] <- image_composite(frames[n],new_insets[n], 
+                                 gravity = "southeast",offset = "+100+100") |> 
+  image_composite(new_man, gravity = "southeast",offset = "+600+140")
+  image_write(image=new_frames[n],path=fnames2[n])
+}
+```
+
+## 
+
+-   Animate as a GIF using the `magick` package.
 
 ```{r animate gif}
 #| eval: false
-target_dir <- "img/frames"
-fnames <- paste0("img\\frames\\", dir("img/frames"))
-image_read(fnames[1:9]) |> 
+fnames2 <- paste0("img\\frames2\\", dir("img/frames"))
+image_read(fnames2[1:9])  |> 
   image_resize("1000x") |> # make size manageable
   image_morph() |>         # smooth transitions. default is 3 frames per frame.
   image_animate() |>       # default is 10 fps
   image_write(path = "img/flood.gif",format = "gif")
 ```
+
 ## The Finished Product
 
-![](img/flood.gif){width="1000"}
+![](img/flood.gif){width="1002"}
 
-## Caveats: This is Just a Dramatization
-
-_ The method we use here more properly would model rising sea levels. 
-  - We don’t know exactly how the water affected each area at what time.
-  - We don’t know what the peak inundation level was for each area.
-  - The water has receeded.
-  
-- This does give a dramatic view of the scope of the destruction.
-  - We do know many people were displaced.
-  - This clearly shows the vulnerable areas.
-  
 ## Thank You!
 
 Visit My Data Science Blog:
 
--    {{< fa blog size=1x >}}`outsiderdata.net`
+-   {{< fa blog size=1x >}} `outsiderdata.net`
 
 This Was Built With Quarto by Posit. Source Here:
 
--    {{< fa brands github size=1xl >}} 
-`github.com/apsteinmetz/r_meetup_talk_1.git'
-    
+-   {{< fa brands github size=1xl >}} `github.com/apsteinmetz/r_meetup_talk_1.git`
+
 Connect With Me:
 
--    {{< fa brands twitter size=1xl >}} `@adababbage`
--    {{< fa house size=1xl >}}`artsteinmetz.com`
--    {{< fa brands linkedin size=1xl >}}`asteinmetz`
+-   {{< fa brands twitter size=1xl >}} `@adababbage`
+-   {{< fa house size=1xl >}} `artsteinmetz.com`
+-   {{< fa brands linkedin size=1xl >}} `asteinmetz`
