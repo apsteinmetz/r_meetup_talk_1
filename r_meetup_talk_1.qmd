@@ -28,7 +28,6 @@ execute:
 -   ArcGIS by ESRI - Great but priced for governments and corporations.
 -   Data in ESRI "Shape Files."
 
-
 ## Modern Tool Chain
 
 -   QGIS is to ArcGIS as GIMP is to Photoshop
@@ -42,9 +41,9 @@ execute:
 ![](img/qgisscreen.jpg)
 :::
 :::
+
 -   Work with "Simple Features" data in R.
-  - Learn more: 
-  https://r-spatial.github.io/sf/articles/sf1.html
+-   Learn more: https://r-spatial.github.io/sf/articles/sf1.html
 
 ## Modern Tool Chain in R
 
@@ -394,6 +393,7 @@ base_map |>
 plot_rising_water <- function(water_level = 0) {
   flood_elmat <- ifelse(kh_elmat < water_level, 0, kh_elmat)
   base_map |>
+    add_overlay("img/esri_world_imagery.png") |> 
     add_water(detect_water(flood_elmat), color = "desert") |>
     add_overlay(roads) |>
     save_png(
@@ -408,13 +408,19 @@ plot_rising_water <- function(water_level = 0) {
 }
 0:8 |> walk(plot_rising_water)
 ```
+
 ## Annotate A Scale
 
 Do Some really cool `magick` and `ggplot` customizing to add a scale to the plot.
-- Just eye candy.
-- Way more code and work than it's worth. 
-- Code Not shown.  Visit the Github repo to see it.
-- `github.com/apsteinmetz/r_meetup_talk_1.git`
+
+-   Just eye candy.
+
+-   Way more code and work than it's worth.
+
+-   Code Not shown. Visit the Github repo to see it.
+
+-   `github.com/apsteinmetz/r_meetup_talk_1.git`
+
 ```{r create inset scale}
 #| echo: false
 #| eval: false
@@ -452,7 +458,7 @@ new_frames[n] <- image_composite(frames[n],new_insets[n],
 }
 ```
 
-## 
+## Render the GIF
 
 -   Animate as a GIF using the `magick` package.
 

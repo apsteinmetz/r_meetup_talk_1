@@ -502,8 +502,8 @@ Art Steinmetz
 <span id="cb1-4"><a href="#cb1-4"></a>  <span class="fu">addProviderTiles</span>(providers<span class="sc">$</span>CartoDB.PositronOnlyLabels,</span>
 <span id="cb1-5"><a href="#cb1-5"></a>                   <span class="at">options =</span> <span class="fu">providerTileOptions</span>(<span class="at">opacity =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-1a9292835f5e894d3942" style="width:960px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-1a9292835f5e894d3942">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"fitBounds":[46.85,32.15,46.3,33.41887,[]],"calls":[{"method":"addProviderTiles","args":["Esri.WorldImagery",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["CartoDB.PositronOnlyLabels",null,null,{"errorTileUrl":"","noWrap":false,"opacity":1,"detectRetina":false}]}]},"evals":[],"jsHooks":[]}</script>
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-3f2bc0ad7186c408fa02" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-3f2bc0ad7186c408fa02">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"fitBounds":[46.85,32.15,46.3,33.41887,[]],"calls":[{"method":"addProviderTiles","args":["Esri.WorldImagery",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["CartoDB.PositronOnlyLabels",null,null,{"errorTileUrl":"","noWrap":false,"opacity":1,"detectRetina":false}]}]},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
@@ -852,27 +852,34 @@ Geodetic CRS:  WGS 84
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>plot_rising_water <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">water_level =</span> <span class="dv">0</span>) {</span>
 <span id="cb25-2"><a href="#cb25-2"></a>  flood_elmat <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(kh_elmat <span class="sc">&lt;</span> water_level, <span class="dv">0</span>, kh_elmat)</span>
 <span id="cb25-3"><a href="#cb25-3"></a>  base_map <span class="sc">|&gt;</span></span>
-<span id="cb25-4"><a href="#cb25-4"></a>    <span class="fu">add_water</span>(<span class="fu">detect_water</span>(flood_elmat), <span class="at">color =</span> <span class="st">"desert"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb25-5"><a href="#cb25-5"></a>    <span class="fu">add_overlay</span>(roads) <span class="sc">|&gt;</span></span>
-<span id="cb25-6"><a href="#cb25-6"></a>    <span class="fu">save_png</span>(</span>
-<span id="cb25-7"><a href="#cb25-7"></a>      <span class="at">filename =</span> <span class="fu">paste0</span>(<span class="st">"img/frames/flood_"</span>, </span>
-<span id="cb25-8"><a href="#cb25-8"></a>                        <span class="fu">formatC</span>(water_level, <span class="at">width =</span> <span class="dv">3</span>, <span class="at">flag =</span> <span class="st">"0"</span>), <span class="st">".png"</span>),</span>
-<span id="cb25-9"><a href="#cb25-9"></a>      <span class="at">title_text =</span> <span class="fu">paste0</span>(</span>
-<span id="cb25-10"><a href="#cb25-10"></a>        <span class="st">"Flood Inundation of the Dnipro</span><span class="sc">\n</span><span class="st">After Kakhovka Dam Destruction</span><span class="sc">\n</span></span>
-<span id="cb25-11"><a href="#cb25-11"></a><span class="st">        Water Level:"</span>,</span>
-<span id="cb25-12"><a href="#cb25-12"></a>        <span class="fu">formatC</span>(water_level, <span class="at">width =</span> <span class="dv">3</span>, <span class="at">flag =</span> <span class="st">" "</span>),<span class="st">" Meters"</span>),</span>
-<span id="cb25-13"><a href="#cb25-13"></a>      <span class="at">title_size =</span> <span class="dv">60</span>, <span class="at">title_bar_color =</span> <span class="st">"white"</span></span>
-<span id="cb25-14"><a href="#cb25-14"></a>    )</span>
-<span id="cb25-15"><a href="#cb25-15"></a>}</span>
-<span id="cb25-16"><a href="#cb25-16"></a><span class="dv">0</span><span class="sc">:</span><span class="dv">8</span> <span class="sc">|&gt;</span> <span class="fu">walk</span>(plot_rising_water)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-4"><a href="#cb25-4"></a>    <span class="fu">add_overlay</span>(<span class="st">"img/esri_world_imagery.png"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb25-5"><a href="#cb25-5"></a>    <span class="fu">add_water</span>(<span class="fu">detect_water</span>(flood_elmat), <span class="at">color =</span> <span class="st">"desert"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-6"><a href="#cb25-6"></a>    <span class="fu">add_overlay</span>(roads) <span class="sc">|&gt;</span></span>
+<span id="cb25-7"><a href="#cb25-7"></a>    <span class="fu">save_png</span>(</span>
+<span id="cb25-8"><a href="#cb25-8"></a>      <span class="at">filename =</span> <span class="fu">paste0</span>(<span class="st">"img/frames/flood_"</span>, </span>
+<span id="cb25-9"><a href="#cb25-9"></a>                        <span class="fu">formatC</span>(water_level, <span class="at">width =</span> <span class="dv">3</span>, <span class="at">flag =</span> <span class="st">"0"</span>), <span class="st">".png"</span>),</span>
+<span id="cb25-10"><a href="#cb25-10"></a>      <span class="at">title_text =</span> <span class="fu">paste0</span>(</span>
+<span id="cb25-11"><a href="#cb25-11"></a>        <span class="st">"Flood Inundation of the Dnipro</span><span class="sc">\n</span><span class="st">After Kakhovka Dam Destruction</span><span class="sc">\n</span></span>
+<span id="cb25-12"><a href="#cb25-12"></a><span class="st">        Water Level:"</span>,</span>
+<span id="cb25-13"><a href="#cb25-13"></a>        <span class="fu">formatC</span>(water_level, <span class="at">width =</span> <span class="dv">3</span>, <span class="at">flag =</span> <span class="st">" "</span>),<span class="st">" Meters"</span>),</span>
+<span id="cb25-14"><a href="#cb25-14"></a>      <span class="at">title_size =</span> <span class="dv">60</span>, <span class="at">title_bar_color =</span> <span class="st">"white"</span></span>
+<span id="cb25-15"><a href="#cb25-15"></a>    )</span>
+<span id="cb25-16"><a href="#cb25-16"></a>}</span>
+<span id="cb25-17"><a href="#cb25-17"></a><span class="dv">0</span><span class="sc">:</span><span class="dv">8</span> <span class="sc">|&gt;</span> <span class="fu">walk</span>(plot_rising_water)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="annotate-a-scale" class="slide level2">
 <h2>Annotate A Scale</h2>
-<p>Do Some really cool <code>magick</code> and <code>ggplot</code> customizing to add a scale to the plot. - Just eye candy. - Way more code and work than it’s worth. - Not shown. Visit the Github repo to see it. - <code>github.com/apsteinmetz/r_meetup_talk_1.git</code></p>
+<p>Do Some really cool <code>magick</code> and <code>ggplot</code> customizing to add a scale to the plot.</p>
+<ul>
+<li><p>Just eye candy.</p></li>
+<li><p>Way more code and work than it’s worth.</p></li>
+<li><p>Code Not shown. Visit the Github repo to see it.</p></li>
+<li><p><code>github.com/apsteinmetz/r_meetup_talk_1.git</code></p></li>
+</ul>
 </section>
-<section id="section-1" class="slide level2">
-<h2></h2>
+<section id="render-the-gif" class="slide level2">
+<h2>Render the GIF</h2>
 <ul>
 <li>Animate as a GIF using the <code>magick</code> package.</li>
 </ul>
@@ -901,7 +908,7 @@ Geodetic CRS:  WGS 84
 </ul>
 <p>Connect With Me:</p>
 <ul>
-<li><i class="fa-brands fa-twitter fa-1xl" aria-label="twitter"></i><code>@adababbage</code></li>
+<li><i class="fa-brands fa-twitter fa-1xl" aria-label="twitter"></i> <code>@adababbage</code></li>
 <li><i class="fa-solid fa-house fa-1xl" aria-label="house"></i> <code>artsteinmetz.com</code></li>
 <li><i class="fa-brands fa-linkedin fa-1xl" aria-label="linkedin"></i> <code>asteinmetz</code></li>
 </ul>
