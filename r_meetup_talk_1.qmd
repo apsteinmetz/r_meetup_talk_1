@@ -413,7 +413,7 @@ plot_rising_water <- function(water_level = 0) {
 Do Some really cool `magick` and `ggplot` customizing to add a scale to the plot.
 - Just eye candy.
 - Way more code and work than it's worth. 
-- Not shown.  Visit the Github repo to see it.
+- Code Not shown.  Visit the Github repo to see it.
 - `github.com/apsteinmetz/r_meetup_talk_1.git`
 ```{r create inset scale}
 #| echo: false
