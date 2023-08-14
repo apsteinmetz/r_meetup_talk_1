@@ -34,11 +34,11 @@ execute:
 
 ::: columns
 ::: {.column width="50%"}
-![](img/arcgispricing.jpg)
+![](img/arcgispricing.jpg){width="520"}
 :::
 
-::: {.column width="50%"}
-![](img/qgisscreen.jpg)
+::: {.column width="45%"}
+![](img/qgisscreen.jpg){width="472"}
 :::
 :::
 
@@ -64,7 +64,6 @@ These tools can access a vast universe of publically available map data includin
 -   USGS topographic data
 -   Regional government property data
 -   Terrain and building LIDAR scans
--   and many more!
 
 Some are open. Some require a free API key. Learn how to request a key and to save it in your `.Renviron` file. Never put key in code!
 
