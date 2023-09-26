@@ -10,7 +10,7 @@
 <link href="r_meetup_talk_1_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <link href="r_meetup_talk_1_files/libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
 <link href="r_meetup_talk_1_files/libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.3.450">
+  <meta name="generator" content="quarto-1.4.383">
 
   <meta name="author" content="Art Steinmetz">
   <title>Powerful GIS Made Easy With R</title>
@@ -33,7 +33,7 @@
     }
     /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -223,7 +223,8 @@
   }
 
   .callout.callout-titled .callout-body > .callout-content > :last-child {
-    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0;
   }
 
   .callout.callout-titled .callout-icon::before {
@@ -387,16 +388,16 @@
     }
   </style>
   <script src="r_meetup_talk_1_files/libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
-  <script src="r_meetup_talk_1_files/libs/jquery-1.12.4/jquery.min.js"></script>
+  <script src="r_meetup_talk_1_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
   <link href="r_meetup_talk_1_files/libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
   <script src="r_meetup_talk_1_files/libs/leaflet-1.3.1/leaflet.js"></script>
   <link href="r_meetup_talk_1_files/libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
   <script src="r_meetup_talk_1_files/libs/proj4-2.6.2/proj4.min.js"></script>
   <script src="r_meetup_talk_1_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
   <link href="r_meetup_talk_1_files/libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
-  <script src="r_meetup_talk_1_files/libs/leaflet-binding-2.1.2/leaflet.js"></script>
+  <script src="r_meetup_talk_1_files/libs/leaflet-binding-2.2.0/leaflet.js"></script>
   <script src="r_meetup_talk_1_files/libs/leaflet-providers-1.13.0/leaflet-providers_1.13.0.js"></script>
-  <script src="r_meetup_talk_1_files/libs/leaflet-providers-plugin-2.1.2/leaflet-providers-plugin.js"></script>
+  <script src="r_meetup_talk_1_files/libs/leaflet-providers-plugin-2.2.0/leaflet-providers-plugin.js"></script>
 </head>
 <body class="quarto-dark">
   <div class="reveal">
@@ -447,9 +448,21 @@ Art Steinmetz
 </ul>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><img data-src="img/arcgispricing.jpg" width="520"></p>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-1" class="quarto-figure quarto-figure-center" width="520">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="img/arcgispricing.jpg" id="fig-539a35d47e664c97a50115a146a7f1bd-1" width="520">
+</div>
+</figure>
+</div>
 </div><div class="column" style="width:45%;">
-<p><img data-src="img/qgisscreen.jpg" width="472"></p>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-2" class="quarto-figure quarto-figure-center" width="472">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="img/qgisscreen.jpg" id="fig-539a35d47e664c97a50115a146a7f1bd-2" width="472">
+</div>
+</figure>
+</div>
 </div>
 </div>
 <ul>
@@ -501,8 +514,8 @@ Art Steinmetz
 <span id="cb1-4"><a href="#cb1-4"></a>  <span class="fu">addProviderTiles</span>(providers<span class="sc">$</span>CartoDB.PositronOnlyLabels,</span>
 <span id="cb1-5"><a href="#cb1-5"></a>                   <span class="at">options =</span> <span class="fu">providerTileOptions</span>(<span class="at">opacity =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-5129d50fac84889eeaef" style="width:960px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-5129d50fac84889eeaef">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"fitBounds":[46.85,32.15,46.3,33.41887,[]],"calls":[{"method":"addProviderTiles","args":["Esri.WorldImagery",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["CartoDB.PositronOnlyLabels",null,null,{"errorTileUrl":"","noWrap":false,"opacity":1,"detectRetina":false}]}]},"evals":[],"jsHooks":[]}</script>
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-6396f615ddcb38acd115" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-6396f615ddcb38acd115">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"fitBounds":[46.85,32.15,46.3,33.41887,[]],"calls":[{"method":"addProviderTiles","args":["Esri.WorldImagery",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["CartoDB.PositronOnlyLabels",null,null,{"errorTileUrl":"","noWrap":false,"opacity":1,"detectRetina":false}]}]},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
@@ -613,14 +626,26 @@ values     : -51, 107  (min, max)</code></pre>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="fu">plot</span>(kherson_elev, <span class="at">col =</span> <span class="fu">pal</span>(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="r_meetup_talk_1_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
+<img data-src="r_meetup_talk_1_files/figure-revealjs/unnamed-chunk-4-1.png" id="fig-539a35d47e664c97a50115a146a7f1bd-3" width="960" class="r-stretch quarto-figure-center"></section>
 <section id="introducting-rayshader-beautiful-3d-visualizations" class="slide level2">
 <h2>Introducting Rayshader: Beautiful 3D Visualizations</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><img data-src="img/gwl_map_history.gif"></p>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-4" class="quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="img/gwl_map_history.gif" id="fig-539a35d47e664c97a50115a146a7f1bd-4">
+</div>
+</figure>
+</div>
 </div><div class="column" style="width:50%;">
-<p><img data-src="img/confusion.gif"></p>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-5" class="quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="img/confusion.gif" id="fig-539a35d47e664c97a50115a146a7f1bd-5">
+</div>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -628,9 +653,21 @@ values     : -51, 107  (min, max)</code></pre>
 <h2>More Rayshader Porn</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><img data-src="img/forest_cover_france.jpg"></p>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-6" class="quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="img/forest_cover_france.jpg" id="fig-539a35d47e664c97a50115a146a7f1bd-6">
+</div>
+</figure>
+</div>
 </div><div class="column" style="width:50%;">
-<p><img data-src="img/chicago_buildings.jpg"></p>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-7" class="quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="img/chicago_buildings.jpg" id="fig-539a35d47e664c97a50115a146a7f1bd-7">
+</div>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -655,7 +692,7 @@ values     : -51, 107  (min, max)</code></pre>
 <section id="shaded-elevation-map-with-natural-water-levels" class="slide level2">
 <h2>Shaded Elevation Map with Natural Water Levels</h2>
 
-<img data-src="img/base_map.png" class="r-stretch quarto-figure-center"></section>
+<img data-src="img/base_map.png" id="fig-539a35d47e664c97a50115a146a7f1bd-8" class="quarto-figure-center r-stretch"></section>
 <section id="add-realism-satellite-imagery" class="slide level2">
 <h2>Add Realism: Satellite Imagery</h2>
 <p>Using the <code>add_overlay()</code> function in <code>Rayshader</code> we can layer on the same satellite image with saw at the start. The <code>basemaps</code> package makes getting a snapshot from any map source a piece of cake.</p>
@@ -676,7 +713,7 @@ values     : -51, 107  (min, max)</code></pre>
 <section id="base-map-with-satellite-image-overlay" class="slide level2">
 <h2>Base Map with Satellite Image Overlay</h2>
 
-<img data-src="img/satview.png" class="r-stretch quarto-figure-center"></section>
+<img data-src="img/satview.png" id="fig-539a35d47e664c97a50115a146a7f1bd-9" class="quarto-figure-center r-stretch"></section>
 <section id="add-more-realism-roads-to-show-human-presence" class="slide level2">
 <h2>Add More Realism: Roads To Show Human Presence</h2>
 <ul>
@@ -771,7 +808,7 @@ Geodetic CRS:  WGS 84
 <section id="kherson-roads-from-open-street-map" class="slide level2">
 <h2>Kherson Roads from Open Street Map</h2>
 
-<img data-src="r_meetup_talk_1_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
+<img data-src="r_meetup_talk_1_files/figure-revealjs/unnamed-chunk-7-1.png" id="fig-539a35d47e664c97a50115a146a7f1bd-10" width="960" class="r-stretch quarto-figure-center"></section>
 <section id="generate-road-overlay-for-rayshader" class="slide level2">
 <h2>Generate Road Overlay for Rayshader</h2>
 <ul>
@@ -795,7 +832,7 @@ Geodetic CRS:  WGS 84
 <span id="cb23-2"><a href="#cb23-2"></a>  <span class="fu">add_overlay</span>(roads) <span class="sc">|&gt;</span> <span class="fu">plot_map</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="r_meetup_talk_1_files/figure-revealjs/show%20all%20layers-1.png" width="960" class="r-stretch"></section>
+<img data-src="r_meetup_talk_1_files/figure-revealjs/show%20all%20layers-1.png" id="fig-539a35d47e664c97a50115a146a7f1bd-11" width="960" class="r-stretch quarto-figure-center"></section>
 <section id="show-rising-water" class="slide level2">
 <h2>Show Rising Water</h2>
 <ul>
@@ -814,14 +851,18 @@ Geodetic CRS:  WGS 84
 </section>
 <section id="section" class="slide level2">
 <h2></h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="img/base_map_water.png" style="width:70.0%"></p>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-12" class="quarto-figure quarto-figure-center" width="70%" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="img/base_map_water.png" id="fig-539a35d47e664c97a50115a146a7f1bd-12" class="quarto-figure-center" style="width:70.0%">
+</div>
 </figure>
 </div>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="img/last_map.png" style="width:70.0%"></p>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-13" class="quarto-figure quarto-figure-center" width="70%" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="img/last_map.png" id="fig-539a35d47e664c97a50115a146a7f1bd-13" class="quarto-figure-center" style="width:70.0%">
+</div>
 </figure>
 </div>
 </section>
@@ -849,7 +890,7 @@ Geodetic CRS:  WGS 84
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>plot_rising_water <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">water_level =</span> <span class="dv">0</span>) {</span>
-<span id="cb25-2"><a href="#cb25-2"></a>  flood_elmat <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(kh_elmat <span class="sc">&lt;</span> water_level, <span class="dv">0</span>, kh_elmat)</span>
+<span id="cb25-2"><a href="#cb25-2"></a>  flood_elmat <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(kh_elmat <span class="sc">&lt;</span> water_level<span class="dv">-2</span>, <span class="sc">-</span><span class="dv">2</span>, kh_elmat)</span>
 <span id="cb25-3"><a href="#cb25-3"></a>  base_map <span class="sc">|&gt;</span></span>
 <span id="cb25-4"><a href="#cb25-4"></a>    <span class="fu">add_overlay</span>(<span class="st">"img/esri_world_imagery.png"</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb25-5"><a href="#cb25-5"></a>    <span class="fu">add_water</span>(<span class="fu">detect_water</span>(flood_elmat), <span class="at">color =</span> <span class="st">"desert"</span>) <span class="sc">|&gt;</span></span>
@@ -894,7 +935,7 @@ Geodetic CRS:  WGS 84
 <section id="the-finished-product" class="slide level2">
 <h2>The Finished Product</h2>
 
-<img data-src="img/flood.gif" width="1002" class="r-stretch"></section>
+<img data-src="img/flood.gif" id="fig-539a35d47e664c97a50115a146a7f1bd-14" width="1002" class="r-stretch quarto-figure-center"></section>
 <section id="thank-you" class="slide level2">
 <h2>Thank You!</h2>
 <p>Visit My Data Science Blog:</p>
@@ -907,7 +948,7 @@ Geodetic CRS:  WGS 84
 </ul>
 <p>Connect With Me:</p>
 <ul>
-<li><i class="fa-brands fa-twitter fa-1xl" aria-label="twitter"></i> <code>@adababbage</code></li>
+<li><i class="fa-brands fa-twitter fa-1xl" aria-label="twitter"></i><i class="fa-brands fa-mastodon fa-1xl" aria-label="mastodon"></i> <code>@adababbage</code></li>
 <li><i class="fa-solid fa-house fa-1xl" aria-label="house"></i> <code>artsteinmetz.com</code></li>
 <li><i class="fa-brands fa-linkedin fa-1xl" aria-label="linkedin"></i> <code>asteinmetz</code></li>
 </ul>
@@ -941,7 +982,6 @@ Geodetic CRS:  WGS 84
       Reveal.initialize({
 'controlsAuto': true,
 'previewLinksAuto': false,
-'smaller': false,
 'pdfSeparateFragments': false,
 'autoAnimateEasing': "ease",
 'autoAnimateDuration': 1,
@@ -1240,10 +1280,9 @@ Geodetic CRS:  WGS 84
         // clear code selection
         e.clearSelection();
       });
-      function tippyHover(el, contentFn) {
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
         const config = {
           allowHTML: true,
-          content: contentFn,
           maxWidth: 500,
           delay: 100,
           arrow: false,
@@ -1253,8 +1292,17 @@ Geodetic CRS:  WGS 84
           interactive: true,
           interactiveBorder: 10,
           theme: 'light-border',
-          placement: 'bottom-start'
+          placement: 'bottom-start',
         };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
           config['offset'] = [0,0];
           config['maxWidth'] = 700;
         window.tippy(el, config); 

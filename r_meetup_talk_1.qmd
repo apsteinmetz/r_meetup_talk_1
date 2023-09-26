@@ -390,7 +390,7 @@ base_map |>
 ```{r}
 #| eval: false
 plot_rising_water <- function(water_level = 0) {
-  flood_elmat <- ifelse(kh_elmat < water_level, 0, kh_elmat)
+  flood_elmat <- ifelse(kh_elmat < water_level-2, -2, kh_elmat)
   base_map |>
     add_overlay("img/esri_world_imagery.png") |> 
     add_water(detect_water(flood_elmat), color = "desert") |>
@@ -487,6 +487,6 @@ This Was Built With Quarto by Posit. Source Here:
 
 Connect With Me:
 
--   {{< fa brands twitter size=1xl >}} `@adababbage`
+-   {{< fa brands twitter size=1xl >}}{{< fa brands mastodon size=1xl >}} `@adababbage`
 -   {{< fa house size=1xl >}} `artsteinmetz.com`
 -   {{< fa brands linkedin size=1xl >}} `asteinmetz`
