@@ -5,6 +5,7 @@ author: "Art Steinmetz"
 format: 
   revealjs:
     theme: blood
+    embed-resources: false
 execute: 
   echo: true
 ---
@@ -487,6 +488,6 @@ This Was Built With Quarto by Posit. Source Here:
 
 Connect With Me:
 
--   {{< fa brands twitter size=1xl >}}{{< fa brands mastodon size=1xl >}} `@adababbage`
+-   {{< fa brands twitter size=1xl >}} {{< fa brands mastodon size=1xl >}} `@adababbage`
 -   {{< fa house size=1xl >}} `artsteinmetz.com`
 -   {{< fa brands linkedin size=1xl >}} `asteinmetz`
