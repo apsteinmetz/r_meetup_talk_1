@@ -1,0 +1,501 @@
+---
+title: "Powerful GIS Made Easy With R"
+subtitle: "Modeling Flooding From The Kakhovka Dam Destruction"
+author: "Art Steinmetz"
+format: typst
+execute: 
+  echo: true
+---
+
+## Goals
+
+-   Learn about the huge strides made recently in open source GIS
+-   See how easy map making is with R
+-   Create a compelling visualization with an animated flood inundation map
+
+## Who I Am
+
+-   Retired Investment Executive
+-   Consultant for Posit
+-   Data Science Hobbyist
+-   Blogger at `outsiderdata.net`
+
+## The Old Days
+
+-   Proprietary GIS data locked up by governments.
+-   ArcGIS by ESRI - Great but priced for governments and corporations.
+-   Data in ESRI "Shape Files."
+
+## Modern Tool Chain
+
+-   QGIS is to ArcGIS as GIMP is to Photoshop
+
+::: columns
+::: {.column width="50%"}
+![](img/arcgispricing.jpg)
+:::
+
+::: {.column width="45%"}
+![](img/qgisscreen.jpg)
+:::
+:::
+
+-   Work with "Simple Features" data in R.
+-   Learn more: https://r-spatial.github.io/sf/articles/sf1.html
+
+## Modern Tool Chain in R
+
+In just the past few years several R packages have arrived that make powerful GIS Tools available to everyone.
+
+-   sf, terra - Manipulate spatial objects.
+-   Maptools, Leaflet - embed interactive maps.
+-   Rayshader - 3D rendering.
+-   osmdata - Access human-made map features.
+-   elevatr - Access topography/bathymetry.
+
+## Modern Data Sets
+
+These tools can access a vast universe of publically available map data including
+
+-   OpenStreetMap
+-   OpenTopogrpahy
+-   USGS topographic data
+-   Regional government property data
+-   Terrain and building LIDAR scans
+
+Some are open. Some require a free API key. Learn how to request a key and to save it in your `.Renviron` file. Never put key in code!
+
+## Background
+
+::: columns
+::: {.column width="60%"}
+Among the horrors of the the war in Ukraine has been the destruction of a dam across the Dnipro river, upstream from Kherson City. This is an ecological and humanitarian disaster as vast acres of settlements, farmlands and wetlands have been destroyed.
+
+Can we visualize how the rising water submerged much of the land downstream from the dam?
+:::
+
+::: {.column width="40%"}
+<iframe width="560" height="315" src="https://www.youtube.com/embed/cALesMyx4UA?&amp;autoplay=1" frameborder="0" allowfullscreen>
+
+</iframe>
+:::
+:::
+
+## Magic Trick #1: Visualize the Affected Area
+
+```{r setup}
+#| echo: false
+library(tidyverse)
+library(fs)
+# GIS packages
+library(elevatr)
+library(rayshader)
+library(sf)
+library(raster)
+library(leaflet)
+library(osmdata)
+library(basemaps)
+# Make GIFs
+library(magick)
+
+dms_to_dec <- function(deg=0, min=0, sec=0) {
+  return(deg + min / 60 + sec / 3600)
+}
+kh_loc <- data.frame(lat = c(dms_to_dec(46,51,00),dms_to_dec(46,18,00)),
+                             lon= c(dms_to_dec(32,09,00),dms_to_dec(33,25,00)) )
+```
+
+```{r leaflet map}
+#| eval: false
+
+leaflet() |> 
+  fitBounds(32.15,46.85,33.41887,46.30) |> 
+  addProviderTiles(providers$Esri.WorldImagery) |> 
+  addProviderTiles(providers$CartoDB.PositronOnlyLabels,
+                   options = providerTileOptions(opacity = 1)) 
+
+```
+::: {.column width="100%"}
+![](img/satview1.png)
+:::
+
+
+## Create a Spatial Object for All Further Manipulations
+
+Introducing the *simple features* object.\
+- It holds spatial metadata and map features.
+
+```{r}
+kh_loc
+kherson_dnipro <- kh_loc |> 
+  sf::st_as_sf(coords = c("lon","lat"),crs = 4326)
+kherson_dnipro
+```
+
+## Simple Features Objects Can be Treated Like Data Frames!
+
+You can add your own features to the map.
+
+```{r}
+kherson_dnipro |> 
+  mutate(my_stuff =c("Corner 1","Corner 2"))
+```
+
+## Simple Feature Objects Are Simple
+
+You can inspect or extract items using familiar techniques while preserving metadata.
+
+```{r inspect sf}
+kherson_dnipro$geometry[1]
+kherson_dnipro$geometry[1][[1]][1]
+
+```
+
+## Introducing Another Spatial Object : Raster
+
+-   A Matrix with metadata and a value for each point/pixel on a map.
+-   Values can be anything. We will get a raster with elevation data in meters.
+-   A simple features object is a description of the map, while a raster object is the drawing of the map.
+
+## Magic Trick #2: Get The Elevation Data with One Line
+
+```{r get elevaton raster}
+#| eval: false
+#| echo: true
+
+kherson_elev <- elevatr::get_elev_raster(kherson_dnipro, 
+                                src = "gl1", 
+                                clip = "bbox",
+                                verbose = FALSE,
+                                serial=TRUE) 
+
+```
+
+```{r}
+#| echo: false
+# dir("data/")
+load("data//kherson_elev.rdata")
+kherson_elev
+```
+
+## Quick and Dirty Plot
+
+Raster has a base R plot method we can use to make a false color relief map.
+
+-   Elevations run from -51 to 107 meters.
+-   Set a color ramp from blue to green.
+
+## False Color Topgraphic Map
+
+```{r}
+pal <- colorRampPalette(c("darkblue","limegreen"))
+plot(kherson_elev, col = pal(10))
+```
+
+## Introducting Rayshader: Beautiful 3D Visualizations
+
+::: columns
+::: {.column width="50%"}
+![](img/gwl_map_history.gif)
+:::
+
+::: {.column width="50%"}
+![](img/confusion.gif)
+:::
+:::
+
+## More Rayshader Porn
+
+::: columns
+::: {.column width="50%"}
+![](img/forest_cover_france.jpg)
+:::
+
+::: {.column width="50%"}
+![](img/chicago_buildings.jpg)
+:::
+:::
+
+## Our Goal: Make an Animated Flood Innundation Map
+
+-   Make a false color shaded relief map as a base layer.
+-   Rayshader detects water as zero elevation or expanses of no elevation change.
+
+```{r create base map}
+#| eval: false
+#| message: false
+kh_elmat <- raster_to_matrix(
+  kherson_elev)
+base_map <- kh_elmat |> 
+  sphere_shade(texture = "imhof1",
+               zscale = .8) |> 
+  add_water(detect_water(kh_elmat),
+            color="desert")
+
+plot_map(base_map)
+```
+
+## Shaded Elevation Map with Natural Water Levels
+
+![](img/base_map.png){fig-align="center"}
+
+```{r}
+#| echo: false
+kh_elmat <- raster_to_matrix(
+  kherson_elev)
+load("data/base_map.rdata")
+```
+
+## Add Realism: Satellite Imagery
+
+Using the `add_overlay()` function in `Rayshader` we can layer on the same satellite image with saw at the start. The `basemaps` package makes getting a snapshot from any map source a piece of cake.
+
+```{r show sat img}
+#| eval: false
+# get image overlay
+satview <- basemaps::basemap_png(
+  ext = kherson_dnipro,
+  map_service = "esri",
+  map_type = "world_imagery",
+  map_res = NULL,
+  verbose = TRUE,
+  browse = FALSE
+)
+
+base_map |> add_overlay(satview) |> plot_map()
+```
+
+## Base Map with Satellite Image Overlay
+
+![](img/satview.png){fig-align="center"}
+
+## Add More Realism: Roads To Show Human Presence
+
+-   Open Street Map API offers many layers of map features.
+-   Take just the osm_lines layer of the "highway" feature.
+
+```{r transform CRS}
+#| eval: false
+kherson_roads <- osmdata::opq(st_bbox(kherson_dnipro)) |> 
+    osmdata::add_osm_feature("highway") |> 
+    osmdata::osmdata_sf()
+
+kherson_roads$osm_lines[1:3,c(1,2,6)]
+```
+
+```{r load roads}
+#| echo: false
+load("data/kherson_roads.rdata")
+kherson_roads$osm_lines[1:3,c(1,2,6)]
+```
+
+## Big Gotcha With GIS: Coordinate Reference System (CRS)
+
+-   There are many, many ways of projecting a curved planet onto a flat surface.
+-   When combining GIS data from different sources, CRS's must match.
+    -   The elevation data comes from the Open Topography API.
+    -   The street data comes from the Open Street Maps API.
+    -   The satellite image comes from ESRI.
+
+## The Solution
+
+-   `st_transfrom` reprojects data to a new CRS.
+
+```{r}
+kherson_lines <- sf::st_transform(kherson_roads$osm_lines,
+                                  crs = raster::crs(kherson_dnipro))
+kherson_lines |> crs() |> cat()
+```
+
+## View the Streets Data
+
+-   Remember how we said a simple feature object is a data frame with metadata?
+-   It just so happens that `ggplot2` has a `geom_sf` for such objects.
+
+```{r ggplot streets}
+#| eval: false
+ggplot(kherson_lines, aes(color = osm_id)) + 
+  geom_sf() +
+  theme(legend.position = "none") +
+  labs(title = "Kherson Roads from Open Street Map")
+```
+
+## Kherson Roads from Open Street Map
+
+```{r}
+#| echo: false
+ggplot(kherson_lines, aes(color = osm_id)) + 
+  geom_sf() +
+  theme(legend.position = "none")
+
+```
+
+## Generate Road Overlay for Rayshader
+
+-   Generate road layer to reuse in each frame of the animation.
+-   Speed up rendering by precomputing layers that don't change.
+
+```{r generate street overlay}
+# a rayshader object we pre-generate now for speed later
+roads <-  rayshader::generate_line_overlay(
+  kherson_lines,
+  heightmap = kh_elmat,
+  extent = extent(kherson_dnipro),
+  linewidth = 2
+)
+
+```
+
+## Put the Layers together
+
+```{r show all layers}
+#| eval: false
+
+base_map |> add_overlay("img/esri_world_imagery.png") |> 
+  add_overlay(roads) |>
+  plot_map()
+
+```
+![](img/show_all_layers.png){fig-align="center"}
+
+## Show Rising Water
+
+-   Set any height in the elevation matrix below the "water level" to zero so Rayshader considers it water.
+-   Order of the overlay matters. Here: sat image, water, roads.
+
+```{r show high water}
+#| eval: false
+water_level = 5 # meters above sea level
+flood_elmat <- ifelse(kh_elmat < water_level, 0, kh_elmat)
+  
+base_map |>
+  add_overlay("img/esri_world_imagery.png") |> 
+  add_water(detect_water(flood_elmat), color = "desert") |>
+  add_overlay(roads) 
+  
+```
+
+## 
+
+![](img/base_map_water.png){width="70%" fig-align="center"}
+
+![](img/last_map.png){width="70%" fig-align="center"}
+
+## Caveats: This is Just a Dramatization
+
+-   The method we use here more properly would model rising sea levels.
+    -   We don't know exactly how the water affected each area at what time.
+    -   We don't know what the peak inundation level was for each area.
+    -   The water has receded.
+-   This does give a dramatic view of the scope of the destruction.
+    -   We do know many people were displaced.
+    -   This clearly shows the vulnerable areas.
+
+## At last, Let's Animate!
+
+-   Loop through different values for `water_level`.
+-   Save indivdual images as frames.
+
+```{r}
+#| eval: false
+plot_rising_water <- function(water_level = 0) {
+  flood_elmat <- ifelse(kh_elmat < water_level-2, -2, kh_elmat)
+  base_map |>
+    add_overlay("img/esri_world_imagery.png") |> 
+    add_water(detect_water(flood_elmat), color = "desert") |>
+    add_overlay(roads) |>
+    save_png(
+      filename = paste0("img/frames/flood_", 
+                        formatC(water_level, width = 3, flag = "0"), ".png"),
+      title_text = paste0(
+        "Flood Inundation of the Dnipro\nAfter Kakhovka Dam Destruction\n
+        Water Level:",
+        formatC(water_level, width = 3, flag = " ")," Meters"),
+      title_size = 60, title_bar_color = "white"
+    )
+}
+0:8 |> walk(plot_rising_water)
+```
+
+## Annotate A Scale
+
+Do Some really cool `magick` and `ggplot` customizing to add a scale to the plot.
+
+-   Just eye candy.
+
+-   Way more code and work than it's worth.
+
+-   Code Not shown. Visit the Github repo to see it.
+
+-   `github.com/apsteinmetz/r_meetup_talk_1.git`
+
+```{r create inset scale}
+#| echo: false
+#| eval: false
+draw_inset <- function(water_level){
+  df <- enframe(water_level)
+  gg <- ggplot(df,aes(1,water_level)) + geom_col(fill="blue") +
+    ylim(0,10) + 
+    theme_void() + 
+    theme(panel.grid.major.y = element_line(),
+          panel.background = element_rect(fill="forestgreen")) + 
+    annotate("text",x=1,y=9,
+             label = "Flood",  size = 40) +
+    annotate("text",x=1,y=4,
+             label = paste0(water_level," Meters"), size = 40) 
+  ggsave(paste0("insets/inset_",water_level,".png"),gg,device = "png",path="img")
+}
+0:8 |> walk(draw_inset)
+
+man <- image_read("img/man.png")
+new_man <- image_scale(man, "x200")
+fnames <- paste0("img\\frames\\", dir("img/frames"))
+fnames2 <- paste0("img\\frames2\\", dir("img/frames"))
+frames <- image_read(fnames[1:9])
+inames <- paste0("img\\insets\\", dir("img/insets"))
+insets <- image_read(inames[1:9])
+new_insets <- image_scale(insets, "600x1000!")
+new_frames <- frames
+# Add plot to annotated graphic
+# image_composite is not vectorized properly
+for (n in 1:9){
+new_frames[n] <- image_composite(frames[n],new_insets[n], 
+                                 gravity = "southeast",offset = "+100+100") |> 
+  image_composite(new_man, gravity = "southeast",offset = "+600+140")
+  image_write(image=new_frames[n],path=fnames2[n])
+}
+```
+
+## Render the GIF
+
+-   Animate as a GIF using the `magick` package.
+
+```{r animate gif}
+#| eval: false
+fnames2 <- paste0("img\\frames2\\", dir("img/frames"))
+image_read(fnames2[1:9])  |> 
+  image_resize("1000x") |> # make size manageable
+  image_morph() |>         # smooth transitions. default is 3 frames per frame.
+  image_animate() |>       # default is 10 fps
+  image_write(path = "img/flood.gif",format = "gif")
+```
+
+## The Finished Product
+
+![](img/flood.gif)
+
+## Thank You!
+
+Visit My Data Science Blog:
+
+-   {{< fa blog size=1x >}} `outsiderdata.net`
+
+This Was Built With Quarto by Posit. Source Here:
+
+-   {{< fa brands github size=1xl >}} `github.com/apsteinmetz/r_meetup_talk_1.git`
+
+Connect With Me:
+
+-   {{< fa brands twitter size=1xl >}} {{< fa brands mastodon size=1xl >}} `@adababbage`
+-   {{< fa house size=1xl >}} `artsteinmetz.com`
+-   {{< fa brands linkedin size=1xl >}} `asteinmetz`
